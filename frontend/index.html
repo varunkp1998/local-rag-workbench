@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>RAG Workbench – Local</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">RW</div>
+                <div class="brand-text">
+                    <h1>RAG Workbench</h1>
+                    <p>Local knowledge workspace</p>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-item active" data-view="ingest">
+                    <span>Knowledge Base</span>
+                </button>
+                <button class="nav-item" data-view="assistant">
+                    <span>Assistant</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="sidebar-caption">
+                    All processing (index + LLM) runs on your machine.
+                </p>
+            </div>
+        </aside>
+
+        <main class="main">
+            <!-- Ingest View -->
+            <section class="view view-active" id="view-ingest">
+                <header class="view-header">
+                    <h2>Knowledge Base</h2>
+                    <p>Upload text documents and build a semantic index over your own content.</p>
+                </header>
+
+                <section class="card">
+                    <h3>Ingest documents</h3>
+                    <p>You can upload one or more <strong>.txt</strong> files. They will be cleaned, split into chunks, embedded, and stored in a local FAISS index.</p>
+                    <div class="form-row">
+                        <input id="fileInput" type="file" accept=".txt" multiple />
+                        <button id="ingestBtn">Ingest</button>
+                    </div>
+                    <p id="ingestStatus" class="status"></p>
+                </section>
+
+                <section class="card subtle">
+                    <h3>Index behaviour</h3>
+                    <ul class="bullet-list">
+                        <li>Each ingest call replaces the previous index (simple demo behaviour).</li>
+                        <li>Chunks are created with overlap to preserve context continuity.</li>
+                        <li>Embeddings use <code>all-MiniLM-L6-v2</code> for a good speed/quality trade-off.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- Assistant View -->
+            <section class="view" id="view-assistant">
+                <header class="view-header">
+                    <h2>Assistant</h2>
+                    <p>Query the indexed knowledge with a local LLM and switch between answer styles.</p>
+                </header>
+
+                <section class="layout-two-column">
+                    <div class="column">
+                        <section class="card">
+                            <h3>Ask a question</h3>
+                            <textarea id="questionInput" rows="5"
+                                placeholder="Ask anything grounded in your ingested documents..."></textarea>
+
+                            <div class="controls-row">
+                                <label>
+                                    Top-K
+                                    <input id="topKInput" type="number" value="4" min="1" max="10" />
+                                </label>
+
+                                <label>
+                                    Mode
+                                    <select id="modeSelect">
+                                        <option value="standard">Standard answer</option>
+                                        <option value="explain">Explain &amp; justify</option>
+                                        <option value="probe">Ask me questions</option>
+                                    </select>
+                                </label>
+
+                                <button id="askBtn">Run</button>
+                            </div>
+
+                            <p id="queryStatus" class="status"></p>
+                            <p id="modelInfo" class="meta-line"></p>
+                        </section>
+
+                        <section class="card">
+                            <div class="card-header-row">
+                                <h3>Answer</h3>
+                                <button id="togglePromptBtn" class="chip-button">
+                                    Show / hide prompt
+                                </button>
+                            </div>
+                            <div id="answerBox" class="answer-box"></div>
+                            <pre id="promptBox" class="prompt-box hidden"></pre>
+                        </section>
+                    </div>
+
+                    <div class="column">
+                        <section class="card">
+                            <h3>Retrieved context</h3>
+                            <p class="card-subtitle">
+                                Each item below is a chunk retrieved from FAISS with its similarity distance.
+                            </p>
+                            <div id="sourcesList" class="sources-list"></div>
+                        </section>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# Virtual env
+.venv/
+venv/
+
+# Mac junk
+.DS_Store
+
+# Model / index artefacts
+faiss_index.index
+faiss_metadata.pkl
+
+# Frontend cache
+node_modules/
+dist/

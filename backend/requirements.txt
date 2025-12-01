@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sentence-transformers
+faiss-cpu
+numpy
+langchain-text-splitters
+transformers
+accelerate
+# Install torch separately for your platform, e.g.:
+# pip install 'torch==2.3.0' --index-url https://download.pytorch.org/whl/cpu
