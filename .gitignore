@@ -19,3 +19,6 @@ faiss_metadata.pkl
 # Frontend cache
 node_modules/
 dist/
+
+# Local LLM models
+backend/models/*.gguf
