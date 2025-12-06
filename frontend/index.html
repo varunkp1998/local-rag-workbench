@@ -1,128 +1,695 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8" />
-    <title>RAG Workbench – Local</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <title>Local RAG Workbench</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
+      background: radial-gradient(circle at top, #1d283a 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1120px;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.8);
+      padding: 24px 28px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.65);
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .pill-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: radial-gradient(circle at top, #1e293b 0, #020617 120%);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #020617 0, #020617 55%, #020617 100%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(30, 64, 175, 0.65);
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .upload-box {
+      border-radius: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: radial-gradient(circle at top left, #020617 0, #020617 100%);
+    }
+
+    input[type="file"] {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      color: #0b1120;
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.45);
+    }
+
+    button.secondary {
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      box-shadow: none;
+    }
+
+    textarea, input[type="text"], input[type="number"] {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      background: radial-gradient(circle at top, #020617 0, #020617 70%);
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      color: var(--text);
+      resize: vertical;
+      min-height: 44px;
+    }
+
+    textarea:focus,
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .inline-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .mode-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.08s ease, border-color 0.08s ease, color 0.08s ease;
+    }
+
+    .chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .numeric {
+      max-width: 70px;
+      font-size: 0.8rem;
+    }
+
+    .answer-box {
+      border-radius: 16px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 12px;
+      min-height: 110px;
+      background: radial-gradient(circle at top, #020617 0, #020617 100%);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .answer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .status-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+    }
+
+    .status-pill.ok {
+      border-color: rgba(34, 197, 94, 0.6);
+      color: #4ade80;
+    }
+
+    .status-pill.warn {
+      border-color: rgba(249, 115, 22, 0.6);
+      color: #fdba74;
+    }
+
+    .status-pill.bad {
+      border-color: rgba(248, 113, 113, 0.6);
+      color: #fecaca;
+    }
+
+    .meta-row {
+      margin-top: 6px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .meta-label {
+      opacity: 0.85;
+    }
+
+    .toggle-link {
+      font-size: 0.75rem;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .chunks-list {
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 10px;
+      background: radial-gradient(circle at top left, #020617 0, #020617 100%);
+      max-height: 220px;
+      overflow: auto;
+      font-size: 0.78rem;
+    }
+
+    .chunk-item {
+      border-radius: 10px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 8px;
+      margin-bottom: 6px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .chunk-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .badge-small {
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.65rem;
+    }
+
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 10px;
+      padding: 8px;
+      overflow: auto;
+      max-height: 220px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .status-text {
+      font-size: 0.76rem;
+      color: var(--muted);
+      min-height: 1em;
+    }
+
+    .status-text.working {
+      color: #eab308;
+    }
+
+    .status-text.error {
+      color: #fecaca;
+    }
+  </style>
 </head>
 <body>
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-logo">RW</div>
-                <div class="brand-text">
-                    <h1>RAG Workbench</h1>
-                    <p>Local knowledge workspace</p>
-                </div>
+  <div class="shell">
+    <header class="header">
+      <div class="title-block">
+        <div class="title">
+          Local RAG Workbench
+          <span class="badge">In-house LLM · RAG</span>
+        </div>
+        <div class="subtitle">
+          Retrieval-Augmented Generation over your own documents. All processing happens locally on your machine.
+        </div>
+      </div>
+      <div class="pill-bar">
+        <span class="pill-dot"></span>
+        <span>Model: local GGUF · No cloud APIs</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- LEFT: Knowledge + controls -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Knowledge Base</div>
+            <div class="card-sub">Upload and index local documents for retrieval.</div>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <div class="section-label">Add documents</div>
+          <input id="fileInput" type="file" accept=".txt,.md,.pdf,.docx" />
+          <div class="small">
+            Start with plain text (.txt) for best results. Files stay on this machine and are never uploaded anywhere.
+          </div>
+          <button id="ingestBtn">
+            Ingest &amp; Index
+          </button>
+          <div id="ingestStatus" class="status-text"></div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid rgba(31,41,55,0.9); margin: 10px 0;" />
+
+        <div>
+          <div class="section-label">Query settings</div>
+          <div class="inline-controls" style="margin-top: 6px;">
+            <div class="mode-group">
+              <div class="chip active" data-mode="standard">Standard</div>
+              <div class="chip" data-mode="explain">Explain</div>
+              <div class="chip" data-mode="probe">Ask me questions</div>
             </div>
-
-            <nav class="nav">
-                <button class="nav-item active" data-view="ingest">
-                    <span>Knowledge Base</span>
-                </button>
-                <button class="nav-item" data-view="assistant">
-                    <span>Assistant</span>
-                </button>
-            </nav>
-
-            <div class="sidebar-footer">
-                <p class="sidebar-caption">
-                    All processing (index + LLM) runs on your machine.
-                </p>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:0.75rem;color:var(--muted);">Top-K</span>
+              <input id="topKInput" class="numeric" type="number" min="1" max="8" value="4" />
             </div>
-        </aside>
+          </div>
+        </div>
 
-        <main class="main">
-            <!-- Ingest View -->
-            <section class="view view-active" id="view-ingest">
-                <header class="view-header">
-                    <h2>Knowledge Base</h2>
-                    <p>Upload text documents and build a semantic index over your own content.</p>
-                </header>
+        <div style="margin-top:12px;">
+          <div class="section-label">System status</div>
+          <div id="systemStatus" class="status-text">
+            Backend: waiting for first request.
+          </div>
+        </div>
+      </section>
 
-                <section class="card">
-                    <h3>Ingest documents</h3>
-                    <p>You can upload one or more <strong>.txt</strong> files. They will be cleaned, split into chunks, embedded, and stored in a local FAISS index.</p>
-                    <div class="form-row">
-                        <input id="fileInput" type="file" accept=".txt" multiple />
-                        <button id="ingestBtn">Ingest</button>
-                    </div>
-                    <p id="ingestStatus" class="status"></p>
-                </section>
+      <!-- RIGHT: Ask + Answer -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ask a Question</div>
+            <div class="card-sub">Answers are grounded in your indexed documents whenever possible.</div>
+          </div>
+          <button id="askBtn">
+            Ask
+          </button>
+        </div>
 
-                <section class="card subtle">
-                    <h3>Index behaviour</h3>
-                    <ul class="bullet-list">
-                        <li>Each ingest call replaces the previous index (simple demo behaviour).</li>
-                        <li>Chunks are created with overlap to preserve context continuity.</li>
-                        <li>Embeddings use <code>all-MiniLM-L6-v2</code> for a good speed/quality trade-off.</li>
-                    </ul>
-                </section>
-            </section>
+        <div>
+          <textarea
+            id="questionInput"
+            rows="3"
+            placeholder="Ask something about your uploaded documents, e.g. “What is retrieval-augmented generation and why is it used?”"
+          ></textarea>
+        </div>
 
-            <!-- Assistant View -->
-            <section class="view" id="view-assistant">
-                <header class="view-header">
-                    <h2>Assistant</h2>
-                    <p>Query the indexed knowledge with a local LLM and switch between answer styles.</p>
-                </header>
+        <div class="answer-box" id="answerBox">
+          <div class="answer-header">
+            <div class="section-label">Answer</div>
+            <div id="groundingPill" class="status-pill">
+              Grounding: n/a
+            </div>
+          </div>
+          <div id="answerText" style="white-space:pre-wrap;">
+            No answer yet. Ask a question once you have ingested some documents.
+          </div>
+          <div class="meta-row">
+            <span class="meta-label" id="modeMeta">Mode: –</span>
+            <span class="meta-label" id="modelMeta">Model: –</span>
+            <span class="meta-label" id="timeMeta"></span>
+          </div>
+        </div>
 
-                <section class="layout-two-column">
-                    <div class="column">
-                        <section class="card">
-                            <h3>Ask a question</h3>
-                            <textarea id="questionInput" rows="5"
-                                placeholder="Ask anything grounded in your ingested documents..."></textarea>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div class="section-label">Evidence &amp; prompt</div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span id="toggleChunks" class="toggle-link">Show evidence chunks</span>
+            <span id="togglePrompt" class="toggle-link">Show raw prompt</span>
+          </div>
+        </div>
 
-                            <div class="controls-row">
-                                <label>
-                                    Top-K
-                                    <input id="topKInput" type="number" value="4" min="1" max="10" />
-                                </label>
+        <div id="chunksPanel" class="chunks-list hidden"></div>
+        <pre id="promptPanel" class="hidden"></pre>
 
-                                <label>
-                                    Mode
-                                    <select id="modeSelect">
-                                        <option value="standard">Standard answer</option>
-                                        <option value="explain">Explain &amp; justify</option>
-                                        <option value="probe">Ask me questions</option>
-                                    </select>
-                                </label>
+        <div id="queryStatus" class="status-text" style="margin-top:6px;"></div>
+      </section>
+    </main>
+  </div>
 
-                                <button id="askBtn">Run</button>
-                            </div>
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
 
-                            <p id="queryStatus" class="status"></p>
-                            <p id="modelInfo" class="meta-line"></p>
-                        </section>
+    const fileInput = document.getElementById("fileInput");
+    const ingestBtn = document.getElementById("ingestBtn");
+    const ingestStatus = document.getElementById("ingestStatus");
 
-                        <section class="card">
-                            <div class="card-header-row">
-                                <h3>Answer</h3>
-                                <button id="togglePromptBtn" class="chip-button">
-                                    Show / hide prompt
-                                </button>
-                            </div>
-                            <div id="answerBox" class="answer-box"></div>
-                            <pre id="promptBox" class="prompt-box hidden"></pre>
-                        </section>
-                    </div>
+    const modeChips = document.querySelectorAll(".chip");
+    const topKInput = document.getElementById("topKInput");
+    const systemStatus = document.getElementById("systemStatus");
 
-                    <div class="column">
-                        <section class="card">
-                            <h3>Retrieved context</h3>
-                            <p class="card-subtitle">
-                                Each item below is a chunk retrieved from FAISS with its similarity distance.
-                            </p>
-                            <div id="sourcesList" class="sources-list"></div>
-                        </section>
-                    </div>
-                </section>
-            </section>
-        </main>
-    </div>
+    const askBtn = document.getElementById("askBtn");
+    const questionInput = document.getElementById("questionInput");
+    const answerText = document.getElementById("answerText");
+    const groundingPill = document.getElementById("groundingPill");
+    const modeMeta = document.getElementById("modeMeta");
+    const modelMeta = document.getElementById("modelMeta");
+    const timeMeta = document.getElementById("timeMeta");
+    const queryStatus = document.getElementById("queryStatus");
+    const chunksPanel = document.getElementById("chunksPanel");
+    const promptPanel = document.getElementById("promptPanel");
+    const toggleChunks = document.getElementById("toggleChunks");
+    const togglePrompt = document.getElementById("togglePrompt");
 
-    <script src="app.js"></script>
+    let currentMode = "standard";
+
+    modeChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        modeChips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        currentMode = chip.dataset.mode;
+      });
+    });
+
+    function setSystemStatus(text, isWorking = false, isError = false) {
+      systemStatus.textContent = text;
+      systemStatus.classList.remove("working", "error");
+      if (isWorking) systemStatus.classList.add("working");
+      if (isError) systemStatus.classList.add("error");
+    }
+
+    function setQueryStatus(text, isWorking = false, isError = false) {
+      queryStatus.textContent = text;
+      queryStatus.classList.remove("working", "error");
+      if (isWorking) queryStatus.classList.add("working");
+      if (isError) queryStatus.classList.add("error");
+    }
+
+    function setGroundingPill(conf) {
+      const pill = groundingPill;
+      pill.classList.remove("ok", "warn", "bad");
+      pill.textContent = `Grounding: ${conf}`;
+      if (conf === "High") pill.classList.add("ok");
+      else if (conf === "Medium") pill.classList.add("warn");
+      else if (conf === "Low") pill.classList.add("bad");
+    }
+
+    ingestBtn.addEventListener("click", async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        ingestStatus.textContent = "Please choose a file to ingest.";
+        ingestStatus.classList.add("error");
+        return;
+      }
+
+      ingestBtn.disabled = true;
+      ingestStatus.textContent = "Uploading and indexing…";
+      ingestStatus.classList.remove("error");
+      setSystemStatus("Ingesting documents and building index…", true, false);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/ingest`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          throw new Error(`Backend returned ${res.status}`);
+        }
+        const data = await res.json();
+        ingestStatus.textContent = `Ingestion complete. Indexed ${data.num_chunks ?? "?"} chunks.`;
+        setSystemStatus("Backend ready. Documents indexed.", false, false);
+      } catch (err) {
+        console.error(err);
+        ingestStatus.textContent = "Ingestion failed. Check backend logs.";
+        ingestStatus.classList.add("error");
+        setSystemStatus("Backend error during ingestion.", false, true);
+      } finally {
+        ingestBtn.disabled = false;
+      }
+    });
+
+    askBtn.addEventListener("click", async () => {
+      const question = questionInput.value.trim();
+      let top_k = parseInt(topKInput.value, 10);
+
+      if (!question) {
+        setQueryStatus("Please enter a question.", true, false);
+        return;
+      }
+
+      if (isNaN(top_k) || top_k < 1) top_k = 4;
+      if (top_k > 8) top_k = 8;
+      topKInput.value = top_k;
+
+      askBtn.disabled = true;
+      setQueryStatus("Retrieving context and generating answer…", true, false);
+      const started = performance.now();
+
+      try {
+        const res = await fetch(`${API_BASE}/api/query`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question,
+            top_k,
+            mode: currentMode,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Backend returned ${res.status}`);
+        }
+
+        const data = await res.json();
+        const elapsedMs = performance.now() - started;
+
+        answerText.textContent = data.answer || "(No answer returned.)";
+        modeMeta.textContent = `Mode: ${data.mode ?? "-"}`;
+        modelMeta.textContent = `Model: ${data.model_name ?? "-"}`;
+        timeMeta.textContent = `Latency: ${elapsedMs.toFixed(0)} ms`;
+
+        setGroundingPill(data.grounding_confidence || "Unknown");
+        setQueryStatus("Answer ready.", false, false);
+        setSystemStatus("Backend online and responding.", false, false);
+
+        // Evidence chunks
+        chunksPanel.innerHTML = "";
+        const chunks = data.chunks || [];
+        chunks.forEach(chunk => {
+          const div = document.createElement("div");
+          div.className = "chunk-item";
+          const sim = chunk.similarity != null ? chunk.similarity.toFixed(4) : "n/a";
+          div.innerHTML = `
+            <div class="chunk-header">
+              <span>[Source ${chunk.rank}]</span>
+              <span class="badge-small">similarity: ${sim}</span>
+            </div>
+            <div>${chunk.text}</div>
+          `;
+          chunksPanel.appendChild(div);
+        });
+
+        // Raw prompt
+        promptPanel.textContent = data.raw_prompt || "";
+
+      } catch (err) {
+        console.error(err);
+        setQueryStatus("Query failed. Check backend logs.", false, true);
+        setSystemStatus("Backend error during query.", false, true);
+      } finally {
+        askBtn.disabled = false;
+      }
+    });
+
+    toggleChunks.addEventListener("click", () => {
+      chunksPanel.classList.toggle("hidden");
+      toggleChunks.textContent = chunksPanel.classList.contains("hidden")
+        ? "Show evidence chunks"
+        : "Hide evidence chunks";
+    });
+
+    togglePrompt.addEventListener("click", () => {
+      promptPanel.classList.toggle("hidden");
+      togglePrompt.textContent = promptPanel.classList.contains("hidden")
+        ? "Show raw prompt"
+        : "Hide raw prompt";
+    });
+  </script>
 </body>
 </html>
