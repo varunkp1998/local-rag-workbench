@@ -22,3 +22,8 @@ dist/
 
 # Local LLM models
 backend/models/*.gguf
+# Local RAG artefacts
+backend/tfidf_matrix.npy
+backend/tfidf_metadata.pkl
+backend/tfidf_vectorizer.pkl
+rag_test_knowledge.txt
